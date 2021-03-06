@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<h1>{{ course }}</h1>
+<br>
+<ul class="list-group">
+    {% for lesson in course.lesson_set.all %}
+
+    <li class="list-group-item">{{ lesson }}</li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

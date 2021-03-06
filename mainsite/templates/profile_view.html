@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'profile_view.css' %}">
+    <title>CodeJedi | View Profile</title>
+</head>
+
+<body>
+    <div class="card">
+        <div class="avatar">
+            <img src="https://robohash.org/{{user.email}}?gravatar=yes">
+        </div>
+        <div class="title">
+            <h2>{{user.first_name}} {{user.last_name}}</h2>
+        </div>
+        <div class="description">{{user.user_summary}}</div>
+        <div class="social">
+            <ul>
+                <li><a href="{{user.linkedin_url}}" target="_blank"><i class="fab fa-linkedin"></i></a></li>
+                <li><a href="{{user.twitter_url}}" target="_blank"><i class="fab fa-twitter"></i></a></li>
+                <li><a href="{{user.github_url}}" target="_blank"><i class="fab fa-github"></i></a></li>
+            </ul>
+        </div>
+        <div class="end">
+            Powered by <a href="{% url 'landing' %}">CodeJedi</a>
+        </div>
+    </div>
+</body>
+
+</html>

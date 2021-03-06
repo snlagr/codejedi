@@ -1,0 +1,26 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeJedi | Register</title>
+    <link rel="stylesheet" href="{% static 'login.css' %}">
+</head>
+
+<body>
+    <form action="{% url 'register' %}" method="post">
+        {% csrf_token %}
+        <h1>CodeJedi</h1>
+        <input placeholder="Username" type="text" name="username" />
+        <input placeholder="Email" type="email" name="email" />
+        <input placeholder="Password " type="password" name="password">
+        <input placeholder="Confirm Password" type="password" name="confirmation">
+        <button class="btn">Register</button>
+        <h6><a href="{% url 'login' %}">Log In?</a></h6>
+    </form>
+</body>
+
+</html>

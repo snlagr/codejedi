@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% block body %}
+
+
+
+<form action="{% url 'edit_profile' %}" method="POST">
+    {% csrf_token %}
+    <div class="row row-col-2 g-4">
+        <div class="col mb-3">
+            <label class="form-label">First Name</label>
+            <input type="text" class="form-control" value="{{ user.first_name }}" name="first_name">
+        </div>
+        <div class="col mb-3">
+            <label class="form-label">Last Name</label>
+            <input type="text" class="form-control" value="{{ user.last_name }}" name="last_name">
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="exampleInputPassword1" class="form-label">Summary</label>
+        <input type="text" class="form-control" id="exampleInputPassword1" value="{{ user.user_summary }}"
+            name="summary">
+        <div class="form-text">We will grab your profile image from <a href="https://en.gravatar.com/">Gravatar</a>.
+        </div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">LinkedIn Url</label>
+        <input type="text" class="form-control" value="{{ user.linkedin_url }}" name="linkedin_url">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Twitter Url</label>
+        <input type="text" class="form-control" value="{{ user.twitter_url }}" name="twitter_url">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Github Url</label>
+        <input type="text" class="form-control" value="{{ user.github_url }}" name="github_url">
+    </div>
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+    <a class="btn btn-primary" href="{% url 'view_profile' user.username %}" target="_blank">Your Public Profile</a>
+</form>
+
+{% endblock %}
