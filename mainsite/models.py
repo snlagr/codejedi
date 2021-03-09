@@ -20,6 +20,11 @@ class Course(models.Model):
 class Lesson(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     lesson_title = models.CharField(max_length=100)
+    lesson_description = models.TextField(max_length=1000, null=True)
 
     def __str__(self):
         return self.lesson_title
+
+
+# class TestCase(models.Model):
+#     lesson = models.ForeignKey(Course, on_delete=models.CASCADE)

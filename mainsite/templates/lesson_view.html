@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+{% load static %}
+{% block body %}
+
+<h1>{{ lesson }}</h1>
+
+<div>
+    {{ lesson_description | safe }}
+</div>
+
+<textarea id="editor"></textarea>
+
+<br>
+<div class="d-flex justify-content-between">
+    <textarea name="" id="" cols="30" rows="5" placeholder="Custom input..."
+        style="width: 49%; padding: 10px;"></textarea>
+    <div style="width: 49%; border: 1px solid black; padding:10px">Custom output...</div>
+</div>
+<br>
+
+<div class="d-flex justify-content-between">
+    <div>
+        {% if prev_lesson %}
+        <a href="{% url 'view_lesson' prev_lesson.id %}" class="btn btn-primary">Previous Lesson</a>
+        {% endif %}
+        {% if next_lesson %}
+        <a href="{% url 'view_lesson' next_lesson.id %}" class="btn btn-primary">Next Lesson</a>
+        {% endif %}
+    </div>
+
+    <div>
+        <button class="btn btn-danger">Run</button>
+        <button class="btn btn-success">Submit</button>
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="{% static 'codemirror/theme/solarized.css' %}">
+<link rel="stylesheet" href="{% static 'codemirror/lib/codemirror.css' %}">
+<script src="{% static 'codemirror/lib/codemirror.js' %}"></script>
+<script src="{% static 'codemirror/mode/python/python.js' %}"></script>
+
+<script>
+    let editor = CodeMirror.fromTextArea(document.querySelector('#editor'), {
+        mode: 'python',
+        lineNumbers: true,
+        theme: "solarized light"
+    });
+</script>
+
+<script src="{% static 'lesson_view.js' %}"></script>
+
+{% endblock %}

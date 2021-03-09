@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from .models import User, Course, Lesson
+from markdown2 import markdown
 
 
 def landing(request):
@@ -94,3 +95,17 @@ def profile_view(request, username):
 def course_view(request, course_id):
     course = Course.objects.get(pk=course_id)
     return render(request, 'course_view.html', {'course': course})
+
+
+def lesson_view(request, lesson_id):
+    lesson = Lesson.objects.get(pk=lesson_id)
+    try:
+        lesson_description = markdown(lesson.lesson_description)
+    except:
+        lesson_description = ''
+    return render(request, 'lesson_view.html', {
+        'lesson': lesson,
+        'lesson_description': lesson_description,
+        'next_lesson': Lesson.objects.filter(course=lesson.course, id__gt=lesson.id).first(),
+        'prev_lesson': Lesson.objects.filter(course=lesson.course, id__lt=lesson.id).last()
+    })
