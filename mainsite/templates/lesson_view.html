@@ -45,7 +45,7 @@
 </div>
 <select class="form-select" id="language">
     <option selected value="none">Select a language</option>
-    {% if lesson.course.language == all %}
+    {% if lesson.course.language == "all" %}
     <option value="python3">Python 3</option>
     <option value="cpp17">C++</option>
     <option value="nodejs">NodeJS</option>
@@ -73,12 +73,7 @@ print(ans) -->
 <br>
 <div class="d-flex justify-content-between">
     <textarea name="" id="customInput" cols="30" rows="5" placeholder="Custom input..."
-        style="width: 49%; padding: 10px;">
-3
-1
-2
-3
-    </textarea>
+        style="width: 49%; padding: 10px;"></textarea>
     <div style="width: 49%; border: 1px solid black; padding:10px" id="customOut">
         Custom Output...
         <div id="customLoad" class="fa-4x d-flex justify-content-center align-items-center"

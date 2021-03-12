@@ -1,3 +1,9 @@
+import json
+import requests
+import os
+import email
+import smtplib
+import ssl
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
@@ -8,13 +14,17 @@ from django.db import IntegrityError
 from .models import User, Course, Lesson
 from markdown2 import markdown
 from dotenv import load_dotenv
-import json
-import requests
-import os
+from email import encoders
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from PIL import Image, ImageDraw, ImageFont
 load_dotenv()
 
 clientSecret = os.getenv('clientSecret')
 clientId = os.getenv('clientId')
+sender_email = os.getenv('sender_email')
+password = os.getenv('password').replace('@', '#')
 
 
 def landing(request):
@@ -84,6 +94,8 @@ def register(request):
                 "message": "Username already taken."
             })
         login(request, user)
+        sendEmail(email, "Welcome to CodeJedi",
+                  "Hope you have a great journey with us.")
         return HttpResponseRedirect(reverse("courses"))
     else:
         return render(request, "register.html")
@@ -99,6 +111,7 @@ def profile_edit(request):
         logged_user.linkedin_url = request.POST['linkedin_url']
         logged_user.twitter_url = request.POST['twitter_url']
         logged_user.github_url = request.POST['github_url']
+        logged_user.email = request.POST['email']
         logged_user.save()
         return HttpResponseRedirect(reverse('edit_profile'))
     return render(request, 'profile_edit.html')
@@ -200,7 +213,70 @@ def claimcert(request):
         return HttpResponseRedirect(reverse("landing"))
 
     data = json.load(request)
-    course = Course.objects.get(pk=data["courseid"])
-    print(course)
-
+    course = Course.objects.get(pk=data["courseid"]).course_title
+    name = request.user.first_name + " " + request.user.last_name
+    cert_data = {
+        "name": name,
+        "course": course
+    }
+    sendEmail(request.user.email, 'Collect your certificate!',
+              'Congratulations for completing the course.', cert_data)
     return JsonResponse({"verdict": "pass"})
+
+
+def sendEmail(receiver_email, subject, body, cert_data=None):
+    # Create a multipart message and set headers
+    message = MIMEMultipart()
+    message["From"] = "CodeJedi " + sender_email
+    message["To"] = receiver_email
+    message["Subject"] = subject
+    # message["Bcc"] = receiver_email  # Recommended for mass emails
+
+    # Add body to email
+    message.attach(MIMEText(body, "plain"))
+
+    if cert_data:
+        img = Image.open('certificate.jpg')
+        draw = ImageDraw.Draw(img)
+
+        font = ImageFont.truetype('arial.ttf', 100)
+        name = cert_data["name"]
+        x = img.width//2 - len(name) * 23
+        draw.text(xy=(x, 650), text=name, fill=(0, 0, 0), font=font)
+
+        font = ImageFont.truetype('arial.ttf', 50)
+        course = "For completion of " + \
+            cert_data["course"] + " course successfully"
+        x = img.width//2 - len(course) * 11
+        draw.text(xy=(x, 850), text=course, fill=(0, 0, 0), font=font)
+
+        img.save('generated_certificate.pdf')
+
+        filename = "generated_certificate.pdf"  # In same directory as script
+
+        # Open PDF file in binary mode
+        with open(filename, "rb") as attachment:
+            # Add file as application/octet-stream
+            # Email client can usually download this automatically as attachment
+            part = MIMEBase("application", "octet-stream")
+            part.set_payload(attachment.read())
+
+        # Encode file in ASCII characters to send by email
+        encoders.encode_base64(part)
+
+        # Add header as key/value pair to attachment part
+        part.add_header(
+            "Content-Disposition",
+            f"attachment; filename= {filename}",
+        )
+
+        # Add attachment to message and convert message to string
+        message.attach(part)
+
+    text = message.as_string()
+
+    # Log in to server using secure context and send email
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receiver_email, text)
