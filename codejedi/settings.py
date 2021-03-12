@@ -28,9 +28,17 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+# CORS_ORIGIN_WHITELIST = (
+#     'http://localhost:8000',
+# )
+
+# CORS_ALLOW_CREDENTIALS = True
+
+
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',  # byme
     'mainsite',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -41,6 +49,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # byme
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -122,3 +131,4 @@ STATIC_URL = '/static/'
 
 # added by me
 AUTH_USER_MODEL = "mainsite.User"
+CORS_ORIGIN_ALLOW_ALL = True  # byme

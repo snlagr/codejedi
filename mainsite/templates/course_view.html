@@ -6,8 +6,16 @@
 <ul class="list-group">
     {% for lesson in course.lesson_set.all %}
 
-    <li class="list-group-item">
+    <li class="list-group-item d-flex justify-content-between">
         <a href="{% url 'view_lesson' lesson.id %}" class="card-link">{{ lesson }}</a>
+
+
+        {% if lesson != curr_lesson and lesson not in user.completed_lessons.all %}
+        <i class="fas fa-lock"></i>
+        {% endif %}
+        {% if lesson in user.completed_lessons.all or curr_lesson == "last_lesson" %}
+        <i class="fas fa-check" style="color: green;"></i>
+        {% endif %}
     </li>
     {% endfor %}
 </ul>

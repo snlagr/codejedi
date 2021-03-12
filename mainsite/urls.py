@@ -10,5 +10,8 @@ urlpatterns = [
     path("profile", views.profile_edit, name="edit_profile"),
     path("profile/<str:username>", views.profile_view, name="view_profile"),
     path("courses/<int:course_id>", views.course_view, name="view_course"),
-    path("lesson/<int:lesson_id>", views.lesson_view, name="view_lesson")
+    path("lesson/<int:lesson_id>", views.lesson_view, name="view_lesson"),
+    path("runcode", views.runcode, name="runcode"),
+    path("submitcode", views.submitcode, name="submitcode"),
+    path("claimcert", views.claimcert, name="claimcert")
 ]

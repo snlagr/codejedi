@@ -1,11 +1,20 @@
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from django.db import IntegrityError
 from .models import User, Course, Lesson
 from markdown2 import markdown
+from dotenv import load_dotenv
+import json
+import requests
+import os
+load_dotenv()
+
+clientSecret = os.getenv('clientSecret')
+clientId = os.getenv('clientId')
 
 
 def landing(request):
@@ -15,8 +24,16 @@ def landing(request):
 @login_required(login_url='login')
 def courses(request):
     course_list = Course.objects.all()
+
+    progress = []
+    for course in course_list:
+        total = len(course.lesson_set.all())
+        completed = len(request.user.completed_lessons.filter(course=course))
+        progress.append([completed, total, completed/total*100])
+    # print(list(zip(course_list, progress)))
+
     return render(request, "courses.html", {
-        'course_list': course_list
+        'course_list': zip(course_list, progress)
     })
 
 
@@ -94,7 +111,15 @@ def profile_view(request, username):
 
 def course_view(request, course_id):
     course = Course.objects.get(pk=course_id)
-    return render(request, 'course_view.html', {'course': course})
+    try:
+        curr_lesson = Lesson.objects.filter(
+            course=course).exclude(users_completed=request.user)[0]
+    except:
+        curr_lesson = 'last_lesson'
+    return render(request, 'course_view.html', {
+        'course': course,
+        'curr_lesson': curr_lesson
+    })
 
 
 def lesson_view(request, lesson_id):
@@ -103,9 +128,79 @@ def lesson_view(request, lesson_id):
         lesson_description = markdown(lesson.lesson_description)
     except:
         lesson_description = ''
+    try:
+        curr_lesson = Lesson.objects.filter(
+            course=lesson.course).exclude(users_completed=request.user)[0]
+    except:
+        curr_lesson = lesson
+
     return render(request, 'lesson_view.html', {
         'lesson': lesson,
         'lesson_description': lesson_description,
         'next_lesson': Lesson.objects.filter(course=lesson.course, id__gt=lesson.id).first(),
-        'prev_lesson': Lesson.objects.filter(course=lesson.course, id__lt=lesson.id).last()
+        'prev_lesson': Lesson.objects.filter(course=lesson.course, id__lt=lesson.id).last(),
+        'curr_lesson': curr_lesson
     })
+
+
+def codeengine(script, lang="python3", stdin=""):
+    headers = {
+        'Content-Type': 'application/json; charset=UTF-8',
+    }
+
+    script = json.dumps(script)
+    stdin = json.dumps(stdin)
+
+    data = '''{"clientId": "''' + clientId + '''",
+            "clientSecret":"''' + clientSecret + '''",
+            "script":''' + script + ''',
+            "language":"''' + lang + '''",
+            "stdin":''' + stdin + ''',
+            "versionIndex":"0"}'''
+
+    response = requests.post(
+        'https://api.jdoodle.com/v1/execute', headers=headers, data=data)
+
+    return response
+
+
+@csrf_exempt
+def runcode(request):
+    if request.method == 'GET':
+        return HttpResponseRedirect(reverse("landing"))
+
+    data = json.load(request)
+    response = codeengine(data['script'], data['lang'], data['stdin'])
+    return JsonResponse(response.json())
+
+
+@csrf_exempt
+def submitcode(request):
+    if request.method == 'GET':
+        return HttpResponseRedirect(reverse("landing"))
+
+    data = json.load(request)
+    lesson = Lesson.objects.get(pk=data['lessonid'])
+
+    for testcase in lesson.testcase_set.all():
+        response = codeengine(data['script'], data['lang'], testcase.input)
+        output = response.json()['output']
+        # print(output.strip(), testcase.output.strip())
+        if (output.strip() != testcase.output.strip()):
+            return JsonResponse({"verdict": "fail"})
+
+    request.user.completed_lessons.add(lesson)
+
+    return JsonResponse({"verdict": "pass"})
+
+
+@csrf_exempt
+def claimcert(request):
+    if request.method == 'GET':
+        return HttpResponseRedirect(reverse("landing"))
+
+    data = json.load(request)
+    course = Course.objects.get(pk=data["courseid"])
+    print(course)
+
+    return JsonResponse({"verdict": "pass"})

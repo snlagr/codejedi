@@ -1,19 +1,31 @@
 {% extends "layout.html" %}
+{% load static %}
 {% block body %}
 
-<div class="row row-cols-1 row-cols-md-3 g-4">
+<div class="row">
     {% for course in course_list %}
-    <div class="col">
-        <div class="card" style="width: 18rem; margin-bottom: 1rem;">
-            <div class="card-body">
-                <h5 class="card-title">{{ course.course_title }}</h5>
-                <p class="card-text">{{ course.course_description }}</p>
-
-                <a href="{% url 'view_course' course.id %}" class="card-link">Start Learning</a>
+    <!-- <div class="col"> -->
+    <div class="card" style="width: 18rem; margin: 1rem;">
+        <div class="card-body">
+            <h5 class="card-title">{{ course.0.course_title }}</h5>
+            <p class="card-text">{{ course.0.course_description }}</p>
+            <p>Completion: <b>{{course.1.0}}/{{course.1.1}}</b></p>
+            <div class="progress" style="height: 10px; margin-bottom: 10px;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar"
+                    aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: {{ course.1.2 }}%;"></div>
             </div>
+            <a href="{% url 'view_course' course.0.id %}" class="card-link" style="font-size: 1.2rem;">Start
+                Learning</a>
+            <br><br>
+            <button data-courseid="{{ course.0.id }}" class="btn btn-dark claimcert" {% if course.1.0 != course.1.1 %}
+                style="display: none;" {% endif %}>
+                Claim Certificate
+            </button>
         </div>
     </div>
+    <!-- </div> -->
     {% endfor %}
 </div>
 
+<script src="{% static 'courses.js' %}"></script>
 {% endblock %}
