@@ -49,6 +49,11 @@ document.querySelector('#runcode').addEventListener('click', () => {
     let script = editor.getValue();
     let stdin = document.querySelector('#customInput').value;
     let lang = document.querySelector('#language').value;
+    if (lang == 'none') {
+        document.querySelector('#customOut').innerHTML = "Custom Output...";
+        swal("Wait!", "Please select a language first.", "warning");
+        return;
+    }
     let callURL = `${document.location.protocol}//${document.location.host}/runcode`;
     let loading_animation = `<div id="customLoad" class="fa-4x d-flex justify-content-center align-items-center"
     style="height: 100%; visibility: hidden;">
