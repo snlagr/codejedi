@@ -23,6 +23,10 @@
     a:visited {
         color: white;
     }
+    
+    #postimage:visited {
+        color: blue;
+    }
 </style>
 {% endblock %}
 
@@ -81,6 +85,20 @@ print(ans) -->
             <i class="fas fa-sync fa-spin"></i>
         </div>
     </div>
+</div>
+<br>
+
+<p>Image to code:</p>
+<div class="input-group mb-3">
+    <input type="text" class="form-control" id="imageURL" placeholder="Enter image URL here" aria-describedby="basic-addon2">
+    <div class="input-group-append">
+      <button class="btn btn-outline-secondary" type="button" id="imgtotext">Submit</button>
+    </div>
+</div>
+<p>You can visit <a href="https://postimages.org/" target="_blank" id="postimage">postimage</a> to upload your code image to get url. (copy direct link)</p>
+
+<div id='image'>
+    <!-- <img src="https://i.postimg.cc/CM3BbGrr/2021-03-19-151541-343x166-scrot.png"> -->
 </div>
 <br>
 

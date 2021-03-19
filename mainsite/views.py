@@ -25,7 +25,10 @@ clientSecret = os.getenv('clientSecret')
 clientId = os.getenv('clientId')
 sender_email = os.getenv('sender_email')
 password = os.getenv('password').replace('@', '#')
-
+rapidAPIkey = os.getenv('rapidAPIkey')
+rapidAPIkey1 = os.getenv('rapidAPIkey1')
+rapidAPIkey2 = os.getenv('rapidAPIkey2')
+count = 0
 
 def landing(request):
     return render(request, "landing.html")
@@ -223,6 +226,7 @@ def claimcert(request):
               'Congratulations for completing the course.', cert_data)
     return JsonResponse({"verdict": "pass"})
 
+url = "https://google-ai-vision.p.rapidapi.com/cloudVision/imageToText"
 
 def sendEmail(receiver_email, subject, body, cert_data=None):
     # Create a multipart message and set headers
@@ -280,3 +284,35 @@ def sendEmail(receiver_email, subject, body, cert_data=None):
     with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
         server.login(sender_email, password)
         server.sendmail(sender_email, receiver_email, text)
+
+@csrf_exempt
+def imgtotext(request):
+    if request.method == 'GET':
+        return HttpResponseRedirect(reverse("landing"))
+
+    global count
+    count += 1
+    rapidAPIkeys = [rapidAPIkey]+[rapidAPIkey1]+[rapidAPIkey2]
+    # print("count : " + str(count) + " key : " + str(keys[count%3]))
+    data = json.load(request)
+    imageURL = data['imageURL']
+
+    url = "https://google-ai-vision.p.rapidapi.com/cloudVision/imageToText"
+
+    payload = '''{
+				"source":"''' + imageURL + '''",
+				"sourceType":"url"
+			}'''
+
+    headers = {
+        'content-type': "application/json",
+        'x-rapidapi-key': rapidAPIkeys[count%3],
+        'x-rapidapi-host': "google-ai-vision.p.rapidapi.com"
+    }
+
+    response = requests.request("POST", url, data=payload, headers=headers)
+
+    try:
+        return JsonResponse({"status": "success", "text": response.json()['text']})
+    except:
+        return JsonResponse({"status": "fail", "text": response.json()['message']})        

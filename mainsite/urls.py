@@ -13,5 +13,6 @@ urlpatterns = [
     path("lesson/<int:lesson_id>", views.lesson_view, name="view_lesson"),
     path("runcode", views.runcode, name="runcode"),
     path("submitcode", views.submitcode, name="submitcode"),
-    path("claimcert", views.claimcert, name="claimcert")
+    path("claimcert", views.claimcert, name="claimcert"),
+    path("imgtotext", views.imgtotext, name="imgtotext")
 ]
