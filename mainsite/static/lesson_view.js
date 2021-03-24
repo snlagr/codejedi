@@ -67,6 +67,7 @@ document.querySelector('#runcode').addEventListener('click', () => {
         "stdin": stdin,
     }).then(res => {
         document.querySelector('#customOut').innerHTML = res.data.output + loading_animation;
+        document.querySelector('#timeMem').innerHTML = "cpu time: " + res.data.cpuTime + "s memory: " + res.data.memory + "bytes";
     });
 });
 
@@ -110,7 +111,7 @@ document.querySelector('#imgtotext').addEventListener('click', () => {
     document.querySelector('#customLoad').style.visibility = "visible";
     
     let imageURL = document.querySelector('#imageURL').value;
-    let img = '<img src="' + imageURL + '">';
+    let img = '<img width= "100%" src="' + imageURL + '">';
     let callURL = `${document.location.protocol}//${document.location.host}/imgtotext`;
     axios.post(callURL, {
         "imageURL": imageURL

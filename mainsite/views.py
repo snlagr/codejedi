@@ -226,7 +226,6 @@ def claimcert(request):
               'Congratulations for completing the course.', cert_data)
     return JsonResponse({"verdict": "pass"})
 
-url = "https://google-ai-vision.p.rapidapi.com/cloudVision/imageToText"
 
 def sendEmail(receiver_email, subject, body, cert_data=None):
     # Create a multipart message and set headers
