@@ -97,8 +97,7 @@ def register(request):
                 "message": "Username already taken."
             })
         login(request, user)
-        sendEmail(email, "Welcome to CodeJedi",
-                  "Hope you have a great journey with us.")
+        sendEmail(email, "Welcome to CodeJedi", "Hope you have a great journey with us.")
         return HttpResponseRedirect(reverse("courses"))
     else:
         return render(request, "register.html")
@@ -186,7 +185,10 @@ def runcode(request):
         return HttpResponseRedirect(reverse("landing"))
 
     data = json.load(request)
-    response = codeengine(data['script'], data['lang'], data['stdin'])
+    try:
+        response = codeengine(data['script'], data['lang'], data['stdin'])
+    except:
+        return JsonResponse({"message" : "internal Server error"})
     return JsonResponse(response.json())
 
 
@@ -296,22 +298,25 @@ def imgtotext(request):
     data = json.load(request)
     imageURL = data['imageURL']
 
-    url = "https://google-ai-vision.p.rapidapi.com/cloudVision/imageToText"
+    url = "https://ultimate-cloud-vision-image.p.rapidapi.com/aws/rekognition/text"
 
-    payload = '''{
-				"source":"''' + imageURL + '''",
-				"sourceType":"url"
-			}'''
-
+    payload = {"image": imageURL}
+    print(payload)
     headers = {
         'content-type': "application/json",
-        'x-rapidapi-key': rapidAPIkeys[count%3],
-        'x-rapidapi-host': "google-ai-vision.p.rapidapi.com"
+        'X-RapidAPI-Key': "c264bb50eemsh1b5a662ff1c48d9p120d98jsn74f318960d75",
+        'X-RapidAPI-Host': "ultimate-cloud-vision-image.p.rapidapi.com"
     }
+    # print(headers)
 
-    response = requests.request("POST", url, data=payload, headers=headers)
-
+    response = requests.request("POST", url, json=payload, headers=headers)
+    text = []
+    # print(response.json())
     try:
-        return JsonResponse({"status": "success", "text": response.json()['text']})
+        for i in range(len(response.json()['TextDetections'])):
+            if (response.json()['TextDetections'][i]['Type'] == 'LINE'):
+                text.append(response.json()['TextDetections'][i]['DetectedText'])
+                text.append("\n")
+        return JsonResponse({"status": "success", "text": ''.join(text)})
     except:
-        return JsonResponse({"status": "fail", "text": response.json()['message']})        
+        return JsonResponse({"status": "fail", "text": "Internal Server Error"})       

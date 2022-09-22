@@ -136,7 +136,7 @@ print(ans) -->
 
 <script src="{% static 'lesson_view.js' %}"></script>
 <script>
-    let lessonId = {{ lesson.id }}
+    let lessonId = "{{ lesson.id }}";
     let nextLesson = "{{ next_lesson }}";
 </script>
 

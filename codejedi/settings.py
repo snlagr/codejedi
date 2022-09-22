@@ -9,7 +9,8 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-
+import os, dotenv
+dotenv.load_dotenv()
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'gy5fly0a33dsk(^o6!n-o&pb=3u3_vf%e)(!imwa*_f+meogtd'
+SECRET_KEY = os.getenv('secret_key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -132,3 +133,4 @@ STATIC_URL = '/static/'
 # added by me
 AUTH_USER_MODEL = "mainsite.User"
 CORS_ORIGIN_ALLOW_ALL = True  # byme
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
