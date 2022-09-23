@@ -28,6 +28,7 @@ password = os.getenv('password').replace('@', '#')
 rapidAPIkey = os.getenv('rapidAPIkey')
 rapidAPIkey1 = os.getenv('rapidAPIkey1')
 rapidAPIkey2 = os.getenv('rapidAPIkey2')
+rapidAPIkey3 = os.getenv('rapidAPIkey3')
 count = 0
 
 def landing(request):
@@ -293,7 +294,7 @@ def imgtotext(request):
 
     global count
     count += 1
-    rapidAPIkeys = [rapidAPIkey]+[rapidAPIkey1]+[rapidAPIkey2]
+    rapidAPIkeys = [rapidAPIkey]+[rapidAPIkey1]+[rapidAPIkey2]+[rapidAPIkey3]
     # print("count : " + str(count) + " key : " + str(keys[count%3]))
     data = json.load(request)
     imageURL = data['imageURL']
@@ -304,7 +305,7 @@ def imgtotext(request):
     print(payload)
     headers = {
         'content-type': "application/json",
-        'X-RapidAPI-Key': "c264bb50eemsh1b5a662ff1c48d9p120d98jsn74f318960d75",
+        'X-RapidAPI-Key': rapidAPIkeys[count%4],
         'X-RapidAPI-Host': "ultimate-cloud-vision-image.p.rapidapi.com"
     }
     # print(headers)
